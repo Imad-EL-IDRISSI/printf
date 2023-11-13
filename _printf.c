@@ -1,6 +1,4 @@
-#include <unistd.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include "main.h"
 
 /**
  * printf - custom printf function
@@ -8,6 +6,7 @@
  *
  * Return: Number of characters printed (excluding the null byte)
  */
+
 int printf(const char *format, ...)
 {
 	int char_pr = 0;
@@ -58,6 +57,7 @@ int printf(const char *format, ...)
 
 		format++;
 	}
+
 	va_end(args);
 
 	return char_pr;
