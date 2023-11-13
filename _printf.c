@@ -10,52 +10,55 @@
  */
 int printf(const char *format, ...)
 {
-	if (!format)
+	int char_pr = 0;
+	va_list args;
+
+	if (format == NULL)
 		return -1;
 
-	va_list args;
+	
 	va_start(args, format);
 
-	int count = 0;
-	
-	while (*format != '\0')
+	while (*format)
 	{
-		if (*format == '%')
+		if (*format != '%')
 		{
-			format++;
-			switch (*format)
-			{
-				case 'c':
-					count += _putchar(va_arg(args, int));
-					break;
-				case 's':
-					{
-						char *str = va_arg(args, char *);
-						if (!str)
-							str = "(null)";
-						while (*str != '\0')
-						{
-							count += _putchar(*str);
-							str++;
-						}
-						break;
-					}
-				case '%':
-					count += _putchar('%');
-					break;
-				default:
-					_putchar('%');
-					count++;
-					break;
-			}
+			write(1, format, 1);
+			char_pr++;
 		}
 		else
 		{
-			count += _putchar(*format);
+			format++;
+			if (*format == '\0')
+				break;
+
+			if (*format == '%')
+			{
+				write(1, format, 1);
+				char_pr++;
+			}
+			else if (*format == 'c')
+			{
+				char c = va_arg(args, int);
+				write(1,&c, 1);
+				char_pr++;
+			}
+			else if (*format == 's')
+			{
+				char *str = va_arg(args, char*);
+				int len = 0;
+
+				while (str[len] != '\0')
+					len++;
+
+				write(1, str, len);
+				char_pr += len;
+			}
 		}
+
 		format++;
 	}
-
 	va_end(args);
-	return (count);
+
+	return char_pr;
 }
