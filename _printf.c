@@ -1,4 +1,32 @@
 #include "main.h"
+#define BUFFER_SIZE 1024
+
+/**
+ * _putchar - writes a character to the standard output
+ * @c: the character to be written.
+ *
+ * Return: 1 on success, -1 otherwize.
+ */
+
+int _putchar(char c)
+{
+	return write(1, &c, 1);
+}
+
+/*
+ * print_buffer - prints the buffer to stdout.
+ * @buffer: the buffer to be printed.
+ * @index_buffer: the index in the buffer.
+ *
+ * Return: number of the characters printed.
+ */
+int print_buffer(char *buffer, unsigned int index_buffer)
+{
+	int count = 0;
+
+	count += write(1, buffer, index_buffer);
+	return (count);
+}
 
 /**
  * printf - custom printf function
@@ -9,56 +37,59 @@
 
 int printf(const char *format, ...)
 {
-	int char_pr = 0;
+	if (!format)
+		return (-1);
+
+	unsigned int i = 0, len = 0, index_buffer = 0;
 	va_list args;
+	int (*function)(va_list, char *, unsigned int);
+	char *buffer;
 
-	if (format == NULL)
-		return -1;
+	va_start(args,format);
+	buffer = malloc(sizeof(char) * BUFFER_SIZE);
 
-	
-	va_start(args, format);
+	if (!buffer)
+		return (-1);
 
-	while (*format)
+	for (i = 0; format && format[i]; i++)
 	{
-		if (*format != '%')
+		if (format[i] == '%')
 		{
-			write(1, format, 1);
-			char_pr++;
+			if (format[i + 1] == '\0')
+			{
+				print_buffer(buffer, index_buffer);
+				free(buffer);
+				va_end(args);
+				return (-1);
+			}
+			else
+			{
+				function = get_print_func(format, i + 1);
+				if (function == NULL)
+				{
+					if(format[i + 1] == ' ' && !format[i  2])
+						return (-1);
+					handl_buf(buffer, format[i], index_buffer), len++, i--;
+				}
+				else
+				{
+					len += function(args, buffer, index_buffer);
+					i += ev_print_func(format, i + 1);
+				}
+			}
+			i ++;
 		}
 		else
 		{
-			format++;
-			if (*format == '\0')
-				break;
-
-			if (*format == '%')
-			{
-				write(1, format, 1);
-				char_pr++;
-			}
-			else if (*format == 'c')
-			{
-				char c = va_arg(args, int);
-				write(1,&c, 1);
-				char_pr++;
-			}
-			else if (*format == 's')
-			{
-				char *str = va_arg(args, char*);
-				int len = 0;
-
-				while (str[len] != '\0')
-					len++;
-
-				write(1, str, len);
-				char_pr += len;
-			}
+			handl_buf(buffer, format[i], index_buffer), len++;
 		}
 
-		format++;
+		for (index_buffer = len; index_buffer > BUFFER_SIZE ;index_buffer -= BUFFER_SIZE)
+			;
 	}
 
+	print_buffer(buffer, index_buffer);
+	free(buffer);
 	va_end(args);
-
-	return char_pr;
+	return len;
 }
