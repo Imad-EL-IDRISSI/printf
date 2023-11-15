@@ -25,7 +25,7 @@ int print_number(va_list args)
 	else
 		num = n;
 
-	for (; num / check >9; )
+	for (; num / check > 9; )
 		check *= 10;
 
 	for (; check != 0; )
@@ -35,7 +35,7 @@ int print_number(va_list args)
 		check /= 10;
 	}
 
-	return(len);
+	return (len);
 }
 
 /**
